@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>Align – Group Decisions, Finally</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --violet: #6C63FF;
+    --violet-light: #8B85FF;
+    --violet-tint: #F0EFFE;
+    --violet-dark: #4C46CC;
+    --ink: #0D0D14;
+    --ink-60: #5A5A72;
+    --ink-30: #AEAEC4;
+    --surface: #FFFFFF;
+    --bg: #F7F6FD;
+    --green: #16A34A;
+    --green-tint: #DCFCE7;
+    --red: #DC2626;
+    --red-tint: #FEE2E2;
+    --amber: #D97706;
+    --amber-tint: #FEF3C7;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow-sm: 0 1px 3px rgba(13,13,20,0.08), 0 1px 2px rgba(13,13,20,0.04);
+    --shadow-md: 0 4px 16px rgba(13,13,20,0.10), 0 2px 4px rgba(13,13,20,0.04);
+    --shadow-violet: 0 4px 20px rgba(108,99,255,0.28);
+  }
+
+  html { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+
+  /* ─── SCREEN SYSTEM ─── */
+  .screen { display: none; width: 100%; max-width: 430px; min-height: 100vh; flex-direction: column; background: var(--surface); position: relative; overflow: hidden; }
+  .screen.active { display: flex; }
+
+  /* ─── NAV BAR ─── */
+  .nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid #EBEBF5; background: var(--surface); position: sticky; top: 0; z-index: 10; }
+  .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 20px; color: var(--violet); letter-spacing: -0.5px; }
+  .nav-badge { font-size: 11px; font-weight: 600; background: var(--violet-tint); color: var(--violet); padding: 3px 8px; border-radius: 99px; }
+  .nav-back { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 500; color: var(--ink-60); cursor: pointer; background: none; border: none; padding: 6px 0; }
+  .nav-back svg { width: 16px; height: 16px; }
+
+  /* ─── SCROLL BODY ─── */
+  .scroll-body { flex: 1; overflow-y: auto; padding: 24px 20px 40px; display: flex; flex-direction: column; gap: 24px; }
+  .scroll-body::-webkit-scrollbar { display: none; }
+
+  /* ─── TYPOGRAPHY ─── */
+  .display { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 32px; line-height: 1.1; letter-spacing: -1px; color: var(--ink); }
+  .display span { color: var(--violet); }
+  .headline { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: -0.5px; color: var(--ink); }
+  .subhead { font-size: 15px; color: var(--ink-60); line-height: 1.55; }
+  .label { font-size: 12px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; color: var(--ink-30); }
+  .caption { font-size: 13px; color: var(--ink-60); }
+
+  /* ─── BUTTONS ─── */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 24px; border-radius: var(--radius); font-size: 15px; font-weight: 600; cursor: pointer; border: none; transition: all 0.18s ease; width: 100%; }
+  .btn-primary { background: var(--violet); color: #fff; box-shadow: var(--shadow-violet); }
+  .btn-primary:active { background: var(--violet-dark); transform: scale(0.98); }
+  .btn-ghost { background: var(--violet-tint); color: var(--violet); }
+  .btn-ghost:active { background: #E2DFFD; }
+  .btn-outline { background: transparent; color: var(--ink-60); border: 1.5px solid #E5E4F0; }
+  .btn-outline:active { background: var(--bg); }
+  .btn-success { background: var(--green); color: #fff; }
+
+  /* ─── CARD ─── */
+  .card { background: var(--surface); border: 1.5px solid #EBEBF5; border-radius: var(--radius); padding: 18px; }
+  .card-tight { padding: 14px; }
+
+  /* ─── FORM ELEMENTS ─── */
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .field input, .field select, .field textarea { width: 100%; padding: 12px 14px; border: 1.5px solid #E5E4F0; border-radius: var(--radius-sm); font-family: 'Inter', sans-serif; font-size: 14px; color: var(--ink); background: var(--surface); outline: none; transition: border-color 0.15s; resize: none; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--violet); }
+  .field input::placeholder { color: var(--ink-30); }
+  .field .hint { font-size: 12px; color: var(--ink-30); }
+
+  /* ─── CHIP SELECTOR ─── */
+  .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { padding: 8px 14px; border-radius: 99px; border: 1.5px solid #E5E4F0; font-size: 13px; font-weight: 500; cursor: pointer; background: var(--surface); color: var(--ink-60); transition: all 0.15s; user-select: none; }
+  .chip.selected { background: var(--violet-tint); border-color: var(--violet); color: var(--violet); font-weight: 600; }
+
+  /* ─── DATE OPTION ─── */
+  .date-option { display: flex; align-items: center; padding: 14px; border: 1.5px solid #E5E4F0; border-radius: var(--radius-sm); cursor: pointer; gap: 14px; transition: all 0.15s; }
+  .date-option.selected { border-color: var(--violet); background: var(--violet-tint); }
+  .date-option .date-cal { width: 44px; height: 44px; border-radius: 10px; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
+  .date-option.selected .date-cal { background: var(--violet); }
+  .date-option .date-cal .cal-day { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: var(--ink); line-height: 1; }
+  .date-option.selected .date-cal .cal-day { color: #fff; }
+  .date-option .date-cal .cal-mon { font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--ink-30); }
+  .date-option.selected .date-cal .cal-mon { color: rgba(255,255,255,0.75); }
+  .date-option .date-info { flex: 1; }
+  .date-option .date-label { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .date-option.selected .date-label { color: var(--violet-dark); }
+  .date-option .date-sub { font-size: 12px; color: var(--ink-30); margin-top: 2px; }
+  .date-check { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #E5E4F0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+  .date-option.selected .date-check { background: var(--violet); border-color: var(--violet); }
+  .date-check svg { display: none; }
+  .date-option.selected .date-check svg { display: block; }
+
+  /* ─── RANGE SLIDER ─── */
+  .range-wrap { position: relative; padding: 8px 0; }
+  input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; background: #E5E4F0; border-radius: 4px; outline: none; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--violet); cursor: pointer; box-shadow: var(--shadow-violet); }
+  .range-labels { display: flex; justify-content: space-between; margin-top: 6px; }
+
+  /* ─── PRIVATE BADGE ─── */
+  .private-badge { display: inline-flex; align-items: center; gap: 5px; background: var(--ink); color: #fff; border-radius: 99px; padding: 4px 10px; font-size: 11px; font-weight: 600; }
+  .private-badge svg { width: 11px; height: 11px; }
+
+  /* ─── CONSTRAINT LOCK CARD ─── */
+  .lock-card { background: var(--bg); border: 1.5px dashed #D0CEEE; border-radius: var(--radius); padding: 16px; position: relative; overflow: hidden; }
+  .lock-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 60%, rgba(108,99,255,0.04)); pointer-events: none; }
+  .lock-card .lock-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+
+  /* ─── VOTE ROW ─── */
+  .vote-row { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1.5px solid #E5E4F0; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; }
+  .vote-row.yes { border-color: var(--green); background: var(--green-tint); }
+  .vote-row.no { border-color: var(--red); background: var(--red-tint); }
+  .vote-row.maybe { border-color: var(--amber); background: var(--amber-tint); }
+  .vote-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .vote-row.yes .vote-icon { background: rgba(22,163,74,0.15); }
+  .vote-row.no .vote-icon { background: rgba(220,38,38,0.12); }
+  .vote-row.maybe .vote-icon { background: rgba(217,119,6,0.12); }
+  .vote-label { font-size: 14px; font-weight: 600; flex: 1; }
+  .vote-row.yes .vote-label { color: var(--green); }
+  .vote-row.no .vote-label { color: var(--red); }
+  .vote-row.maybe .vote-label { color: var(--amber); }
+
+  /* ─── STEP INDICATOR ─── */
+  .steps { display: flex; align-items: center; gap: 6px; padding: 0 0 4px; }
+  .step-dot { width: 6px; height: 6px; border-radius: 50%; background: #E5E4F0; transition: all 0.2s; }
+  .step-dot.active { width: 20px; border-radius: 3px; background: var(--violet); }
+  .step-dot.done { background: var(--violet); opacity: 0.4; }
+
+  /* ─── CONSENSUS RING ─── */
+  .ring-wrap { position: relative; width: 120px; height: 120px; margin: 0 auto; }
+  .ring-wrap svg { transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: #E5E4F0; stroke-width: 10; }
+  .ring-fill { fill: none; stroke: var(--violet); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 339.3; stroke-dashoffset: 339.3; transition: stroke-dashoffset 1.4s cubic-bezier(0.22, 1, 0.36, 1); }
+  .ring-fill.green { stroke: var(--green); }
+  .ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .ring-pct { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--ink); }
+  .ring-sub { font-size: 11px; font-weight: 600; color: var(--ink-30); }
+
+  /* ─── RESULT OPTION ─── */
+  .result-option { border-radius: var(--radius); overflow: hidden; border: 1.5px solid #E5E4F0; }
+  .result-option.winner { border-color: var(--green); }
+  .result-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; }
+  .result-option.winner .result-header { background: var(--green-tint); }
+  .result-title { font-size: 15px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 8px; }
+  .winner-badge { background: var(--green); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; letter-spacing: 0.3px; }
+  .result-body { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .vote-bar-row { display: flex; align-items: center; gap: 10px; }
+  .vote-bar-label { width: 14px; font-size: 15px; }
+  .vote-bar-track { flex: 1; height: 6px; background: #F0EFF8; border-radius: 3px; overflow: hidden; }
+  .vote-bar-fill { height: 100%; border-radius: 3px; transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
+  .vote-bar-fill.g { background: var(--green); }
+  .vote-bar-fill.y { background: var(--amber); }
+  .vote-bar-fill.r { background: var(--red); }
+  .vote-bar-count { font-size: 12px; font-weight: 600; color: var(--ink-60); width: 24px; text-align: right; }
+
+  /* ─── CONSTRAINT SUMMARY ─── */
+  .constraint-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F0EFF8; }
+  .constraint-row:last-child { border-bottom: none; }
+  .constraint-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--violet-tint); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+  .constraint-text { flex: 1; font-size: 13px; font-weight: 500; color: var(--ink); }
+  .constraint-status { font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 99px; }
+  .constraint-status.ok { background: var(--green-tint); color: var(--green); }
+  .constraint-status.warn { background: var(--amber-tint); color: var(--amber); }
+
+  /* ─── SHARE CARD ─── */
+  .share-card { background: var(--ink); border-radius: var(--radius); padding: 18px; color: #fff; }
+  .share-url { background: rgba(255,255,255,0.1); border-radius: var(--radius-sm); padding: 10px 12px; font-family: 'Inter', monospace; font-size: 12px; color: rgba(255,255,255,0.7); word-break: break-all; margin: 10px 0; }
+  .share-btn { background: var(--violet); color: #fff; border: none; border-radius: var(--radius-sm); padding: 10px 16px; font-size: 13px; font-weight: 600; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.15s; }
+  .share-btn:active { background: var(--violet-dark); }
+
+  /* ─── HERO DEMO WIDGET ─── */
+  .demo-widget { background: var(--surface); border: 1.5px solid #EBEBF5; border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow-md); }
+  .demo-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .demo-title .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 1.5s infinite; }
+  .demo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .demo-avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .demo-bar-track { flex: 1; height: 8px; background: #F0EFF8; border-radius: 4px; overflow: hidden; }
+  .demo-bar-fill { height: 100%; border-radius: 4px; background: var(--violet); }
+  .demo-pct { font-size: 12px; font-weight: 700; color: var(--ink-60); width: 28px; text-align: right; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+  /* ─── FEATURE PILLS ─── */
+  .feature-pills { display: flex; flex-direction: column; gap: 10px; }
+  .feature-pill { display: flex; align-items: flex-start; gap: 12px; padding: 14px; background: var(--bg); border-radius: var(--radius-sm); }
+  .feature-pill .fp-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--violet-tint); display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+  .feature-pill .fp-text h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+  .feature-pill .fp-text p { font-size: 12px; color: var(--ink-60); line-height: 1.45; }
+
+  /* ─── TOAST ─── */
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--ink); color: #fff; padding: 12px 20px; border-radius: 99px; font-size: 13px; font-weight: 600; z-index: 100; transition: transform 0.3s cubic-bezier(0.22,1,0.36,1); white-space: nowrap; display: flex; align-items: center; gap: 8px; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ─── DIVIDER ─── */
+  .divider { height: 1px; background: #F0EFF8; }
+
+  /* ─── TRANSITIONS ─── */
+  .fade-in { animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+  .slide-up { animation: slideUp 0.3s cubic-bezier(0.22,1,0.36,1); }
+  @keyframes slideUp { from{opacity:0; transform:translateY(20px);} to{opacity:1; transform:translateY(0);} }
+
+  /* ─── AVATAR STACK ─── */
+  .avatar-stack { display: flex; align-items: center; }
+  .avatar-stack .av { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--surface); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; margin-left: -8px; }
+  .avatar-stack .av:first-child { margin-left: 0; }
+
+  /* ─── MISC ─── */
+  .section-gap { height: 4px; }
+  .flex-row { display: flex; align-items: center; }
+  .justify-between { justify-content: space-between; }
+  .gap-2 { gap: 8px; }
+  .text-violet { color: var(--violet); font-weight: 600; }
+  .pending-wrap { display: flex; align-items: center; gap: 8px; margin-top: -4px; }
+  .pending-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); }
+
+  /* ─── LOCK ANIMATION ─── */
+  @keyframes lockSnap { 0%{transform:rotate(-8deg);} 40%{transform:rotate(4deg);} 70%{transform:rotate(-2deg);} 100%{transform:rotate(0deg);} }
+  .lock-animate { animation: lockSnap 0.4s ease forwards; }
+
+  /* Desktop centering */
+  @media (min-width: 500px) {
+    body { background: #EEEDF8; padding: 24px 0; }
+    .screen { border-radius: 28px; box-shadow: 0 24px 60px rgba(13,13,20,0.18); min-height: auto; max-height: 90vh; }
+    .screen.active { display: flex; }
+    .scroll-body { max-height: calc(90vh - 60px); }
+    .toast { max-width: 430px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+  SCREEN 1: LANDING
+════════════════════════════════════════ -->
+<div id="screen-landing" class="screen active fade-in">
+  <div class="nav">
+    <span class="nav-logo">Align</span>
+    <span class="nav-badge">Beta</span>
+  </div>
+  <div class="scroll-body">
+
+    <!-- Hero -->
+    <div style="padding: 8px 0 4px;">
+      <p class="label" style="margin-bottom:10px;">For groups of 3–20</p>
+      <h1 class="display">Stop debating.<br><span>Start deciding.</span></h1>
+      <p class="subhead" style="margin-top:12px;">Align collects everyone's real availability, budget, and preferences privately — then surfaces the option your whole group can actually agree on.</p>
+    </div>
+
+    <!-- Live Demo Widget -->
+    <div class="demo-widget slide-up">
+      <p class="demo-title">
+        <span class="live-dot"></span>
+        Goa Trip — 8 people responding
+      </p>
+      <div id="demo-rows">
+        <div class="demo-row">
+          <div class="demo-avatar" style="background:#6C63FF;">P</div>
+          <div style="flex:1;font-size:12px;font-weight:600;color:var(--ink);">Feb 14–16</div>
+          <div class="demo-bar-track"><div class="demo-bar-fill" style="width:87%;"></div></div>
+          <div class="demo-pct">87%</div>
+        </div>
+        <div class="demo-row">
+          <div class="demo-avatar" style="background:#22C55E;">✓</div>
+          <div style="flex:1;font-size:12px;font-weight:600;color:var(--ink);">Budget OK</div>
+          <div class="demo-bar-track"><div class="demo-bar-fill" style="width:75%;background:var(--green);"></div></div>
+          <div class="demo-pct">6/8</div>
+        </div>
+        <div class="demo-row">
+          <div class="demo-avatar" style="background:#D97706;">!</div>
+          <div style="flex:1;font-size:12px;font-weight:600;color:var(--ink);">Waiting on 2</div>
+          <div class="demo-bar-track"><div class="demo-bar-fill" style="width:25%;background:var(--amber);animation:waitPulse 1s ease infinite alternate;"></div></div>
+          <div class="demo-pct">2 left</div>
+        </div>
+      </div>
+      <div style="margin-top:12px; padding-top:12px; border-top:1px solid #F0EFF8; display:flex; align-items:center; justify-content:space-between;">
+        <div class="avatar-stack">
+          <div class="av" style="background:#6C63FF;">P</div>
+          <div class="av" style="background:#22C55E;">A</div>
+          <div class="av" style="background:#F59E0B;">R</div>
+          <div class="av" style="background:#EF4444;">S</div>
+          <div class="av" style="background:#8B5CF6;">+4</div>
+        </div>
+        <span style="font-size:12px;color:var(--green);font-weight:600;">↑ Consensus forming</span>
+      </div>
+    </div>
+
+    <!-- Feature pills -->
+    <div class="feature-pills">
+      <div class="feature-pill">
+        <div class="fp-icon">🔒</div>
+        <div class="fp-text">
+          <h4>Private constraints</h4>
+          <p>Budget limits and conflicts are never shown to the group — only the resulting consensus is.</p>
+        </div>
+      </div>
+      <div class="feature-pill">
+        <div class="fp-icon">⚡</div>
+        <div class="fp-text">
+          <h4>No app download</h4>
+          <p>Share a link. Participants vote in their browser. No signup, no friction for anyone.</p>
+        </div>
+      </div>
+      <div class="feature-pill">
+        <div class="fp-icon">🎯</div>
+        <div class="fp-text">
+          <h4>One answer, not a poll</h4>
+          <p>Align surfaces the option with the highest weighted satisfaction — not just most votes.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn btn-primary" onclick="goTo('screen-create')">
+        Create an event
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+      <button class="btn btn-ghost" onclick="goTo('screen-vote')">
+        Preview participant view
+      </button>
+    </div>
+
+    <p style="text-align:center;font-size:12px;color:var(--ink-30);">No account needed · Free during beta</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+  SCREEN 2: CREATE EVENT
+════════════════════════════════════════ -->
+<div id="screen-create" class="screen fade-in">
+  <div class="nav">
+    <button class="nav-back" onclick="goTo('screen-landing')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back
+    </button>
+    <span class="nav-logo">Align</span>
+    <span style="width:48px;"></span>
+  </div>
+  <div class="scroll-body">
+
+    <!-- Steps -->
+    <div>
+      <div class="steps" id="create-steps">
+        <div class="step-dot active" id="step0"></div>
+        <div class="step-dot" id="step1"></div>
+        <div class="step-dot" id="step2"></div>
+      </div>
+      <h2 class="headline" style="margin-top:12px;" id="create-title">What's the plan?</h2>
+      <p class="subhead" style="margin-top:4px;" id="create-sub">Give your group event a name and description.</p>
+    </div>
+
+    <!-- STEP 0: Basics -->
+    <div id="create-step-0" style="display:flex;flex-direction:column;gap:16px;">
+      <div class="field">
+        <label>Event name</label>
+        <input type="text" placeholder="Goa trip with the squad" id="event-name" />
+      </div>
+      <div class="field">
+        <label>What kind of event?</label>
+        <div class="chip-group" id="event-type-chips">
+          <div class="chip selected" onclick="selectChip(this,'event-type-chips')">🏖️ Trip</div>
+          <div class="chip" onclick="selectChip(this,'event-type-chips')">🍽️ Dinner</div>
+          <div class="chip" onclick="selectChip(this,'event-type-chips')">🎉 Party</div>
+          <div class="chip" onclick="selectChip(this,'event-type-chips')">🎬 Movie</div>
+          <div class="chip" onclick="selectChip(this,'event-type-chips')">🏏 Sports</div>
+          <div class="chip" onclick="selectChip(this,'event-type-chips')">✏️ Other</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Short description <span style="color:var(--ink-30);font-weight:400;">(optional)</span></label>
+        <textarea rows="2" placeholder="Anything the group should know upfront…"></textarea>
+      </div>
+    </div>
+
+    <!-- STEP 1: Dates -->
+    <div id="create-step-1" style="display:none;flex-direction:column;gap:12px;">
+      <p class="caption">Add up to 4 date options. Participants will vote on each.</p>
+      <div id="date-options" style="display:flex;flex-direction:column;gap:8px;">
+        <div class="date-option selected" onclick="toggleDate(this)">
+          <div class="date-cal">
+            <span class="cal-day">14</span>
+            <span class="cal-mon">Feb</span>
+          </div>
+          <div class="date-info">
+            <div class="date-label">Fri – Sun, Feb 14–16</div>
+            <div class="date-sub">3 days · Valentine's weekend</div>
+          </div>
+          <div class="date-check">
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5"><path d="M2 6l3 3 5-5"/></svg>
+          </div>
+        </div>
+        <div class="date-option" onclick="toggleDate(this)">
+          <div class="date-cal">
+            <span class="cal-day">21</span>
+            <span class="cal-mon">Feb</span>
+          </div>
+          <div class="date-info">
+            <div class="date-label">Fri – Sun, Feb 21–23</div>
+            <div class="date-sub">3 days · Regular weekend</div>
+          </div>
+          <div class="date-check">
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5"><path d="M2 6l3 3 5-5"/></svg>
+          </div>
+        </div>
+        <div class="date-option" onclick="toggleDate(this)">
+          <div class="date-cal">
+            <span class="cal-day">28</span>
+            <span class="cal-mon">Feb</span>
+          </div>
+          <div class="date-info">
+            <div class="date-label">Fri – Sun, Feb 28 – Mar 2</div>
+            <div class="date-sub">3 days · End of month</div>
+          </div>
+          <div class="date-check">
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5"><path d="M2 6l3 3 5-5"/></svg>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-outline" style="font-size:13px;padding:10px;" onclick="">
+        + Add another date
+      </button>
+    </div>
+
+    <!-- STEP 2: Budget & Preferences -->
+    <div id="create-step-2" style="display:none;flex-direction:column;gap:16px;">
+      <div class="field">
+        <label>Budget range (₹ per person)</label>
+        <div class="chip-group" id="budget-chips">
+          <div class="chip" onclick="selectChip(this,'budget-chips')">Under ₹1k</div>
+          <div class="chip selected" onclick="selectChip(this,'budget-chips')">₹1k–3k</div>
+          <div class="chip" onclick="selectChip(this,'budget-chips')">₹3k–7k</div>
+          <div class="chip" onclick="selectChip(this,'budget-chips')">₹7k+</div>
+        </div>
+        <span class="hint">Participants can set a private cap lower than this — it won't be shown to others.</span>
+      </div>
+      <div class="field">
+        <label>Vote deadline</label>
+        <select>
+          <option>24 hours from now</option>
+          <option>48 hours from now</option>
+          <option>3 days</option>
+          <option>5 days</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Min responses to decide</label>
+        <div class="chip-group" id="quorum-chips">
+          <div class="chip" onclick="selectChip(this,'quorum-chips')">50%</div>
+          <div class="chip selected" onclick="selectChip(this,'quorum-chips')">75%</div>
+          <div class="chip" onclick="selectChip(this,'quorum-chips')">All</div>
+        </div>
+        <span class="hint">Decision locks once this many people have responded.</span>
+      </div>
+      <div class="field">
+        <label>Allow participants to suggest options?</label>
+        <div class="chip-group" id="suggest-chips">
+          <div class="chip selected" onclick="selectChip(this,'suggest-chips')">Yes</div>
+          <div class="chip" onclick="selectChip(this,'suggest-chips')">No</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation buttons -->
+    <div style="display:flex;gap:10px;margin-top:auto;padding-top:8px;">
+      <button class="btn btn-outline" id="prev-btn" onclick="prevStep()" style="display:none;flex:1;">Back</button>
+      <button class="btn btn-primary" id="next-btn" onclick="nextStep()" style="flex:1;">
+        Continue
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+  SCREEN 3: PARTICIPANT VOTING
+════════════════════════════════════════ -->
+<div id="screen-vote" class="screen fade-in">
+  <div class="nav">
+    <button class="nav-back" onclick="goTo('screen-landing')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </button>
+    <span class="nav-logo">Align</span>
+    <span style="font-size:12px;color:var(--ink-30);font-weight:600;">6/8 responded</span>
+  </div>
+  <div class="scroll-body">
+
+    <!-- Event header -->
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+      <div>
+        <p class="label" style="margin-bottom:6px;">🏖️ Trip · Created by Priya</p>
+        <h2 class="headline">Goa trip with the squad</h2>
+        <p class="subhead" style="margin-top:4px;font-size:13px;">Let's finally do this. Set your real constraints — they stay private.</p>
+      </div>
+      <div style="text-align:center;flex-shrink:0;">
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--violet);">23h</div>
+        <div style="font-size:10px;color:var(--ink-30);font-weight:600;">left to vote</div>
+      </div>
+    </div>
+
+    <!-- Pending participants -->
+    <div class="pending-wrap">
+      <div class="pending-dot"></div>
+      <span style="font-size:12px;color:var(--ink-60);">Waiting on <strong>Arjun, Meera</strong></span>
+    </div>
+
+    <!-- Private constraint card -->
+    <div class="lock-card">
+      <div class="lock-header">
+        <span style="font-size:13px;font-weight:700;color:var(--ink);">Your private constraints</span>
+        <span class="private-badge">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1C8.676 1 6 3.676 6 7v1H4a1 1 0 00-1 1v12a1 1 0 001 1h16a1 1 0 001-1V9a1 1 0 00-1-1h-2V7c0-3.324-2.676-6-6-6zm0 2c2.276 0 4 1.724 4 4v1H8V7c0-2.276 1.724-4 4-4zm0 9a2 2 0 110 4 2 2 0 010-4z"/></svg>
+          Only you see this
+        </span>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="field">
+          <label style="font-size:12px;">My budget cap (₹ per person)</label>
+          <input type="number" placeholder="Leave blank if fine with any" style="font-size:14px;" id="budget-input" />
+          <span class="hint">If you set ₹2,000, dates requiring more are excluded for you.</span>
+        </div>
+        <div class="field">
+          <label style="font-size:12px;">Dates I can't make</label>
+          <div class="chip-group" id="blackout-chips">
+            <div class="chip" onclick="this.classList.toggle('selected')" style="font-size:12px;">Feb 14–16</div>
+            <div class="chip" onclick="this.classList.toggle('selected')" style="font-size:12px;">Feb 21–23</div>
+            <div class="chip" onclick="this.classList.toggle('selected')" style="font-size:12px;">Feb 28+</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="lock-indicator" style="margin-top:14px;padding-top:12px;border-top:1px dashed #D0CEEE;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:20px;" id="lock-icon">🔓</span>
+        <span style="font-size:12px;color:var(--ink-60);">Your constraints are saved privately when you vote.</span>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div>
+      <p class="label" style="margin-bottom:12px;">Vote on each date</p>
+      <p class="caption" style="margin-bottom:14px;">Your vote won't show your name to others. Be honest — it improves the result.</p>
+    </div>
+
+    <!-- Date voting cards -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+
+      <!-- Date 1 -->
+      <div class="card card-tight">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--ink);">Feb 14–16 · Valentine's weekend</div>
+            <div style="font-size:12px;color:var(--ink-30);margin-top:2px;">3 days · ~₹2,500/person est.</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:11px;color:var(--green);font-weight:600;">5 ✓</div>
+            <div style="font-size:10px;color:var(--ink-30);">so far</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px;" id="vote-d1">
+          <div class="vote-row yes" onclick="castVote('vote-d1','yes',this)">
+            <div class="vote-icon">✅</div>
+            <span class="vote-label">Works for me</span>
+          </div>
+          <div class="vote-row maybe" onclick="castVote('vote-d1','maybe',this)" style="background:transparent;border-color:#E5E4F0;">
+            <div class="vote-icon" style="background:rgba(217,119,6,0.0);">🤔</div>
+            <span class="vote-label" style="color:var(--ink-60);">Might work</span>
+          </div>
+          <div class="vote-row no" onclick="castVote('vote-d1','no',this)" style="background:transparent;border-color:#E5E4F0;">
+            <div class="vote-icon" style="background:rgba(220,38,38,0.0);">❌</div>
+            <span class="vote-label" style="color:var(--ink-60);">Can't make it</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Date 2 -->
+      <div class="card card-tight">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--ink);">Feb 21–23 · Regular weekend</div>
+            <div style="font-size:12px;color:var(--ink-30);margin-top:2px;">3 days · ~₹2,200/person est.</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:11px;color:var(--green);font-weight:600;">3 ✓</div>
+            <div style="font-size:10px;color:var(--ink-30);">so far</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px;" id="vote-d2">
+          <div class="vote-row yes" onclick="castVote('vote-d2','yes',this)" style="background:transparent;border-color:#E5E4F0;">
+            <div class="vote-icon" style="background:rgba(22,163,74,0.0);">✅</div>
+            <span class="vote-label" style="color:var(--ink-60);">Works for me</span>
+          </div>
+          <div class="vote-row maybe" onclick="castVote('vote-d2','maybe',this)">
+            <div class="vote-icon">🤔</div>
+            <span class="vote-label">Might work</span>
+          </div>
+          <div class="vote-row no" onclick="castVote('vote-d2','no',this)" style="background:transparent;border-color:#E5E4F0;">
+            <div class="vote-icon" style="background:rgba(220,38,38,0.0);">❌</div>
+            <span class="vote-label" style="color:var(--ink-60);">Can't make it</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Date 3 -->
+      <div class="card card-tight">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--ink);">Feb 28 – Mar 2</div>
+            <div style="font-size:12px;color:var(--ink-30);margin-top:2px;">3 days · ~₹2,000/person est.</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:11px;color:var(--amber);font-weight:600;">2 ✓</div>
+            <div style="font-size:10px;color:var(--ink-30);">so far</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px;" id="vote-d3">
+          <div class="vote-row yes" onclick="castVote('vote-d3','yes',this)" style="background:transparent;border-color:#E5E4F0;">
+            <div class="vote-icon" style="background:rgba(22,163,74,0.0);">✅</div>
+            <span class="vote-label" style="color:var(--ink-60);">Works for me</span>
+          </div>
+          <div class="vote-row maybe" onclick="castVote('vote-d3','maybe',this)" style="background:transparent;border-color:#E5E4F0;">
+            <div class="vote-icon" style="background:rgba(217,119,6,0.0);">🤔</div>
+            <span class="vote-label" style="color:var(--ink-60);">Might work</span>
+          </div>
+          <div class="vote-row no" onclick="castVote('vote-d3','no',this)">
+            <div class="vote-icon">❌</div>
+            <span class="vote-label">Can't make it</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vibe preference -->
+    <div class="card">
+      <p style="font-size:13px;font-weight:600;margin-bottom:12px;">What vibe are you after?</p>
+      <div class="chip-group" id="vibe-chips">
+        <div class="chip selected" onclick="this.classList.toggle('selected')">🏄 Beach & chill</div>
+        <div class="chip" onclick="this.classList.toggle('selected')">🍹 Party scene</div>
+        <div class="chip" onclick="this.classList.toggle('selected')">🥾 Adventure</div>
+        <div class="chip" onclick="this.classList.toggle('selected')">📸 Sightseeing</div>
+        <div class="chip" onclick="this.classList.toggle('selected')">🛏️ Full relaxation</div>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <button class="btn btn-primary" onclick="submitVote()">
+      Lock in my vote
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0110 0v4"></path></svg>
+    </button>
+    <p style="text-align:center;font-size:12px;color:var(--ink-30);">Your vote can be changed until the deadline</p>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+  SCREEN 4: CONSENSUS RESULTS
+════════════════════════════════════════ -->
+<div id="screen-results" class="screen fade-in">
+  <div class="nav">
+    <button class="nav-back" onclick="goTo('screen-landing')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </button>
+    <span class="nav-logo">Align</span>
+    <span style="font-size:11px;font-weight:600;background:var(--green-tint);color:var(--green);padding:3px 8px;border-radius:99px;">Decided ✓</span>
+  </div>
+  <div class="scroll-body">
+
+    <!-- Result header -->
+    <div style="text-align:center;padding:8px 0;">
+      <p class="label" style="margin-bottom:8px;">🎉 Your group has aligned</p>
+      <h2 class="headline">Goa Trip — Decided</h2>
+      <p class="subhead" style="margin-top:6px;font-size:13px;">8 of 8 responded · Consensus locked Feb 5, 11:42 PM</p>
+    </div>
+
+    <!-- Consensus ring -->
+    <div style="text-align:center;padding:4px 0;">
+      <div class="ring-wrap">
+        <svg viewBox="0 0 120 120" width="120" height="120">
+          <circle class="ring-bg" cx="60" cy="60" r="54"/>
+          <circle class="ring-fill green" id="ring-fill" cx="60" cy="60" r="54"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-pct" id="ring-pct">0%</div>
+          <div class="ring-sub">consensus</div>
+        </div>
+      </div>
+      <p style="font-size:13px;color:var(--ink-60);margin-top:8px;">Based on real constraints, not just votes</p>
+    </div>
+
+    <!-- Winner option -->
+    <div class="result-option winner">
+      <div class="result-header">
+        <div class="result-title">
+          📅 Feb 14–16 · Valentine's Weekend
+          <span class="winner-badge">BEST FIT</span>
+        </div>
+      </div>
+      <div class="result-body">
+        <p style="font-size:12px;color:var(--ink-60);margin-bottom:6px;">7 of 8 people said yes or maybe</p>
+        <div class="vote-bar-row">
+          <span class="vote-bar-label">✅</span>
+          <div class="vote-bar-track"><div class="vote-bar-fill g" id="bar1" style="width:0%"></div></div>
+          <span class="vote-bar-count">6</span>
+        </div>
+        <div class="vote-bar-row">
+          <span class="vote-bar-label">🤔</span>
+          <div class="vote-bar-track"><div class="vote-bar-fill y" id="bar2" style="width:0%"></div></div>
+          <span class="vote-bar-count">1</span>
+        </div>
+        <div class="vote-bar-row">
+          <span class="vote-bar-label">❌</span>
+          <div class="vote-bar-track"><div class="vote-bar-fill r" id="bar3" style="width:0%"></div></div>
+          <span class="vote-bar-count">1</span>
+        </div>
+        <div style="margin-top:8px;padding-top:8px;border-top:1px solid #F0EFF8;font-size:12px;color:var(--ink-60);">
+          💡 Budget compatible with all 8 participants
+        </div>
+      </div>
+    </div>
+
+    <!-- Other options -->
+    <div>
+      <p class="label" style="margin-bottom:10px;">Other options</p>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="result-option">
+          <div class="result-header" style="background:var(--bg);">
+            <div class="result-title">📅 Feb 21–23 · Regular weekend</div>
+            <span style="font-size:12px;font-weight:600;color:var(--ink-30);">4/8 ✓</span>
+          </div>
+          <div class="result-body">
+            <div class="vote-bar-row">
+              <span class="vote-bar-label">✅</span>
+              <div class="vote-bar-track"><div class="vote-bar-fill g" style="width:37%;"></div></div>
+              <span class="vote-bar-count">3</span>
+            </div>
+            <div class="vote-bar-row">
+              <span class="vote-bar-label">🤔</span>
+              <div class="vote-bar-track"><div class="vote-bar-fill y" style="width:12%;"></div></div>
+              <span class="vote-bar-count">1</span>
+            </div>
+            <div class="vote-bar-row">
+              <span class="vote-bar-label">❌</span>
+              <div class="vote-bar-track"><div class="vote-bar-fill r" style="width:50%;"></div></div>
+              <span class="vote-bar-count">4</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-option">
+          <div class="result-header" style="background:var(--bg);">
+            <div class="result-title">📅 Feb 28 – Mar 2</div>
+            <span style="font-size:12px;font-weight:600;color:var(--ink-30);">2/8 ✓</span>
+          </div>
+          <div class="result-body">
+            <div class="vote-bar-row">
+              <span class="vote-bar-label">✅</span>
+              <div class="vote-bar-track"><div class="vote-bar-fill g" style="width:12%;"></div></div>
+              <span class="vote-bar-count">1</span>
+            </div>
+            <div class="vote-bar-row">
+              <span class="vote-bar-label">🤔</span>
+              <div class="vote-bar-track"><div class="vote-bar-fill y" style="width:12%;"></div></div>
+              <span class="vote-bar-count">1</span>
+            </div>
+            <div class="vote-bar-row">
+              <span class="vote-bar-label">❌</span>
+              <div class="vote-bar-track"><div class="vote-bar-fill r" style="width:75%;"></div></div>
+              <span class="vote-bar-count">6</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Constraints summary -->
+    <div class="card">
+      <p style="font-size:13px;font-weight:700;margin-bottom:4px;">Why Feb 14–16 won</p>
+      <p style="font-size:12px;color:var(--ink-60);margin-bottom:14px;">Constraint analysis (identities hidden)</p>
+      <div class="constraint-row">
+        <div class="constraint-icon">💰</div>
+        <span class="constraint-text">Budget compatible for all 8 people</span>
+        <span class="constraint-status ok">All clear</span>
+      </div>
+      <div class="constraint-row">
+        <div class="constraint-icon">📅</div>
+        <span class="constraint-text">7/8 available or flexible on dates</span>
+        <span class="constraint-status ok">87% fit</span>
+      </div>
+      <div class="constraint-row">
+        <div class="constraint-icon">🏖️</div>
+        <span class="constraint-text">Beach & chill vibes preferred by 6/8</span>
+        <span class="constraint-status ok">Aligned</span>
+      </div>
+      <div class="constraint-row">
+        <div class="constraint-icon">🙋</div>
+        <span class="constraint-text">1 participant can't attend — noted</span>
+        <span class="constraint-status warn">Flagged</span>
+      </div>
+    </div>
+
+    <!-- Share card -->
+    <div class="share-card">
+      <p style="font-size:13px;font-weight:700;margin-bottom:4px;">Share the result</p>
+      <p style="font-size:12px;color:rgba(255,255,255,0.6);">Send this to the group so everyone knows the plan.</p>
+      <div class="share-url">align.app/e/goa-squad-2025 · Feb 14–16 ✓</div>
+      <button class="share-btn" onclick="copyLink()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg>
+        Copy decision link
+      </button>
+    </div>
+
+    <!-- Next step CTA -->
+    <button class="btn btn-primary" onclick="goTo('screen-landing')">
+      Start a new event
+    </button>
+
+    <p style="text-align:center;font-size:12px;color:var(--ink-30);">Results are available for 30 days</p>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ─── NAV TABS (bottom) ─── -->
+<div id="bottom-tabs" style="position:sticky;bottom:0;width:100%;max-width:430px;background:var(--surface);border-top:1px solid #EBEBF5;display:flex;z-index:20;padding:8px 0 12px;">
+  <button onclick="goTo('screen-landing')" class="tab-btn" id="tab-landing" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 0;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#AEAEC4" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span style="font-size:10px;font-weight:600;color:#AEAEC4;">Home</span>
+  </button>
+  <button onclick="goTo('screen-create')" class="tab-btn" id="tab-create" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 0;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#AEAEC4" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    <span style="font-size:10px;font-weight:600;color:#AEAEC4;">Create</span>
+  </button>
+  <button onclick="goTo('screen-vote')" class="tab-btn" id="tab-vote" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 0;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#AEAEC4" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+    <span style="font-size:10px;font-weight:600;color:#AEAEC4;">Vote</span>
+  </button>
+  <button onclick="goTo('screen-results')" class="tab-btn" id="tab-results" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 0;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#AEAEC4" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <span style="font-size:10px;font-weight:600;color:#AEAEC4;">Results</span>
+  </button>
+</div>
+
+<style>
+@keyframes waitPulse { from{width:15%;} to{width:30%;} }
+</style>
+
+<script>
+// ─── SCREEN ROUTING ───
+let currentScreen = 'screen-landing';
+const screens = ['screen-landing','screen-create','screen-vote','screen-results'];
+const tabs = {'screen-landing':'tab-landing','screen-create':'tab-create','screen-vote':'tab-vote','screen-results':'tab-results'};
+
+function goTo(id) {
+  document.getElementById(currentScreen).classList.remove('active');
+  document.getElementById(id).classList.add('active');
+
+  // Update tab active states
+  Object.values(tabs).forEach(t => {
+    const el = document.getElementById(t);
+    el.querySelectorAll('svg').forEach(s => s.setAttribute('stroke','#AEAEC4'));
+    el.querySelectorAll('span').forEach(s => s.style.color = '#AEAEC4');
+  });
+  const activeTab = document.getElementById(tabs[id]);
+  if (activeTab) {
+    activeTab.querySelectorAll('svg').forEach(s => s.setAttribute('stroke','#6C63FF'));
+    activeTab.querySelectorAll('span').forEach(s => s.style.color = '#6C63FF');
+  }
+
+  currentScreen = id;
+  if (id === 'screen-results') initResults();
+}
+
+// ─── CREATE EVENT STEPS ───
+let createStep = 0;
+const stepTitles = ['What\'s the plan?','When are you thinking?','Budget & preferences'];
+const stepSubs = ['Give your event a name and type.','Add date options — participants vote on each.','Set the budget range and voting rules.'];
+
+function nextStep() {
+  if (createStep < 2) {
+    document.getElementById('create-step-' + createStep).style.display = 'none';
+    createStep++;
+    document.getElementById('create-step-' + createStep).style.display = 'flex';
+    updateStepUI();
+  } else {
+    // Final step: generate link
+    showShareModal();
+  }
+}
+
+function prevStep() {
+  if (createStep > 0) {
+    document.getElementById('create-step-' + createStep).style.display = 'none';
+    createStep--;
+    document.getElementById('create-step-' + createStep).style.display = 'flex';
+    updateStepUI();
+  }
+}
+
+function updateStepUI() {
+  document.getElementById('create-title').textContent = stepTitles[createStep];
+  document.getElementById('create-sub').textContent = stepSubs[createStep];
+  document.getElementById('prev-btn').style.display = createStep > 0 ? 'flex' : 'none';
+  const nextBtn = document.getElementById('next-btn');
+  if (createStep === 2) {
+    nextBtn.innerHTML = 'Create event & get link <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"></path></svg>';
+  } else {
+    nextBtn.innerHTML = 'Continue <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+  }
+  // Update dots
+  for (let i = 0; i <= 2; i++) {
+    const dot = document.getElementById('step'+i);
+    dot.className = 'step-dot';
+    if (i < createStep) dot.classList.add('done');
+    else if (i === createStep) dot.classList.add('active');
+  }
+}
+
+function showShareModal() {
+  const eventName = document.getElementById('event-name').value || 'goa-squad-2025';
+  const slug = eventName.toLowerCase().replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-');
+  showToast('🔗 Event created! Link copied to clipboard');
+  setTimeout(() => goTo('screen-vote'), 1200);
+}
+
+// ─── CHIP SELECTOR ───
+function selectChip(el, groupId) {
+  document.querySelectorAll('#' + groupId + ' .chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ─── DATE TOGGLE ───
+function toggleDate(el) {
+  el.classList.toggle('selected');
+}
+
+// ─── VOTE CASTING ───
+function castVote(groupId, type, clicked) {
+  const group = document.getElementById(groupId);
+  const rows = group.querySelectorAll('.vote-row');
+  rows.forEach(r => {
+    const wasActive = r.contains(clicked) || r === clicked;
+    r.style.background = 'transparent';
+    r.style.borderColor = '#E5E4F0';
+    r.querySelector('.vote-label').style.color = 'var(--ink-60)';
+    r.querySelector('.vote-icon').style.background = 'transparent';
+  });
+
+  // Activate clicked
+  if (type === 'yes') {
+    clicked.style.background = 'var(--green-tint)';
+    clicked.style.borderColor = 'var(--green)';
+    clicked.querySelector('.vote-label').style.color = 'var(--green)';
+    clicked.querySelector('.vote-icon').style.background = 'rgba(22,163,74,0.15)';
+  } else if (type === 'maybe') {
+    clicked.style.background = 'var(--amber-tint)';
+    clicked.style.borderColor = 'var(--amber)';
+    clicked.querySelector('.vote-label').style.color = 'var(--amber)';
+    clicked.querySelector('.vote-icon').style.background = 'rgba(217,119,6,0.12)';
+  } else {
+    clicked.style.background = 'var(--red-tint)';
+    clicked.style.borderColor = 'var(--red)';
+    clicked.querySelector('.vote-label').style.color = 'var(--red)';
+    clicked.querySelector('.vote-icon').style.background = 'rgba(220,38,38,0.12)';
+  }
+}
+
+// ─── SUBMIT VOTE ───
+function submitVote() {
+  // Lock animation
+  const lockIcon = document.getElementById('lock-icon');
+  lockIcon.textContent = '🔒';
+  lockIcon.classList.add('lock-animate');
+  showToast('🔒 Vote locked in — thanks!');
+  setTimeout(() => goTo('screen-results'), 1400);
+}
+
+// ─── RESULTS ANIMATION ───
+function initResults() {
+  setTimeout(() => {
+    // Ring animation
+    const ring = document.getElementById('ring-fill');
+    const target = 87;
+    const circumference = 339.3;
+    ring.style.strokeDashoffset = circumference - (circumference * target / 100);
+
+    // Count up the percentage
+    const pctEl = document.getElementById('ring-pct');
+    let current = 0;
+    const interval = setInterval(() => {
+      current = Math.min(current + 2, target);
+      pctEl.textContent = current + '%';
+      if (current >= target) clearInterval(interval);
+    }, 25);
+
+    // Bar animations
+    setTimeout(() => {
+      document.getElementById('bar1').style.width = '75%';
+      document.getElementById('bar2').style.width = '12%';
+      document.getElementById('bar3').style.width = '12%';
+    }, 300);
+  }, 150);
+}
+
+// ─── COPY LINK ───
+function copyLink() {
+  showToast('✅ Decision link copied!');
+}
+
+// ─── TOAST ───
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ─── INIT: highlight home tab ───
+document.addEventListener('DOMContentLoaded', () => {
+  const activeTab = document.getElementById(tabs[currentScreen]);
+  if (activeTab) {
+    activeTab.querySelectorAll('svg').forEach(s => s.setAttribute('stroke','#6C63FF'));
+    activeTab.querySelectorAll('span').forEach(s => s.style.color = '#6C63FF');
+  }
+});
+</script>
+</body>
+</html>
